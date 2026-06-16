@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Which Minion are you</title>  
+<link rel="stylesheet" href="l2elyas_quiz.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">  
+<style>
+  /* this style just aligns answers vertically */
+  label { display: block; }
+  /* don't put your style here... add your own .css file */
+</style>
+</head>
+<body>
+
+<script src="https://student.cs.uwaterloo.ca/~cs100/js/cs100-s25-a2-quiz.js"></script>
+<script>
+
+/************************************************************************************
+  For this quiz, you need to have a specific number of possible results (or outcomes)
+  MODIFY THIS VALUE TO MATCH YOUR QUIZ
+ ************************************************************************************/
+  
+  const num_results = 4
+  
+/************************************************************************************
+
+ The only other "coding" you have to do is establish the weights for each of your
+ results for each possible question AND answer combination.
+ 
+ REMEMBER! in Computer Science we start counting at zero (0), so:
+ * if you have four possible results, they will be r0, r1, r2, r3
+ * similarly, the first question will be q0, then q1, q2, etc.
+ * and for each question, there will be answer a0, then a1, a2, etc.
+ 
+ Putting that all together, we use the following notation:
+ 
+ qXaYrZ determines how:
+ * result rZ's score is affected if the user picks
+ * answer aY on
+ * question qX
+ 
+ This is known as the "weight" of rZ if answer aY is picked on question qX
+ 
+ so q0a2r3 corresponds to result r3's weight if answer a2 is picked on question q0
+ 
+ You will need to populate an "array", with all of the possible weights:
+ 
+ We recommend you establish a range of weights such as 0...5 or -10...10
+ A HIGH value means that the result is MORE likely to answer the question that way
+ A LOW  value means the result is LESS likely to answer the question that way.
+ 
+ Example: if your results are animals (e.g., Which animal are you most like?)
+ and the results are r0: Tiger, r1: Penguin, r2: Bear
+ and the question is:
+ q0: Where would you prefer to hang out?
+     a0: The jungle
+     a1: Antarctica
+ 
+ For a0: the jungle, we'll assign Tiger: 5, Penguin: 0, Bear: 2
+ For a1: Antarctica, we'll assign Tiger: 0, Penguin: 5, Bear: 3
+ 
+ Note that the number of possible answers does NOT need to match the number of
+ possible results.
+ 
+ Also, you don't have to put all results as "extremes". A bear would probably prefer
+ the Antarctic, but could be okay in the jungle.
+ 
+ The weights for q0a0 are given as: [a0q0r0, a0q0r1, a0q0r2] e.g.,  [5, 0, 2]
+ The weights for q0a1 are: [a0q1r0, a0q1r1, a0q1r2] e.g., [0, 5, 3]
+ 
+ Putting them together, the weights for all of q0 are:
+ 
+ [[a0q0r0, a0q0r1, a0q0r2], [a0q1r0, a0q1r1, a0q1r2]] e.g., [[0, 5, 3], [5, 0, 2]]
+ 
+ You will create a massive array with all of the question/answer/result possibilities
+ 
+var weights = [
+  [[q0a0r0, q0a0r1, q0a0r2, ...], [q0a1r0, q0a1r1, ...], [q0a2r0, ...], [...]],
+  [[q1a0r0, q1a0r1, q1a0r2, ...], [q1a1r0, q1a1r1, ...], [...]],
+  [[...], [...], [...]],
+  [[...], [...], [...]]
+]
+
+ Common mistake to avoid: messing up your commas and your square brackets
+ PRO TIP: put commas after everything UNLESS the next "thing" is a closing ]
+ 
+ If nothing is happening, you may have a syntax error. 
+ In Chrome, you may get some debugging information.
+ Try turning on "Developer Tools" [Ctrl-Shift-I] and click on the "Console" tab
+ and look for errors 
+ 
+*************************************************************************************/
+
+// The Harry Potter weights: (you will replace these with your own)
+
+const weights = [
+	[[1, 0, 0, 5],[0, 0, 5, 1],[5, 1, 0, 0],[0, 5, 0, 0]],
+	[[0, 0, 5, 1],[0, 5, 0, 0],[5, 1, 0, 0],[0, 0, 1, 5]],
+	[[0, 0, 1, 5],[5, 1, 0, 0],[0, 0, 5, 1],[0, 5, 0, 0]], 
+	[[0, 0, 5, 1],[5, 1, 0, 0],[0, 0, 0, 5],[0, 5, 0, 0]],
+	[[0, 5, 0, 0],[0, 0, 0, 5],[0, 0, 5, 1],[5, 1, 0, 0]],
+	[[1, 0, 5, 0],[5, 1, 0, 0],[0, 0, 0, 5],[0, 5, 0, 0]],
+	[[0, 0, 5, 0],[0, 0, 0, 5],[5, 0, 0, 0],[0, 5, 0, 0]],
+	[[0, 0, 5, 1],[0, 5, 0, 0],[0, 0, 0, 5],[5, 1, 0, 0]],
+	[[0, 0, 5, 1],[0, 0, 0, 5],[5, 1, 0, 0],[0, 5, 0, 0]],
+    [[0, 0, 1, 5],[5, 1, 0, 0],[0, 0, 5, 1],[0, 5, 0, 0]], 
+];
+
+
+/************************************************************************************
+  Change the following from false to true to display all results at the start
+  (useful for testing and styling your responses)
+*************************************************************************************/
+
+  var always_show = false
+
+</script>
+
+<!--
+
+That was the JavaScript part, now for the HTML part.
+
+A) FORMATTING YOUR QUESTION AND ANSWERS:
+  
+   For each question, you need the question itself, and then the answers, where the answers
+   need to be given as:
+   
+   <label><input type="radio" name="qX" value="aY">Text for aY of qX</label>
+   
+   For example:
+   
+   <label><input type="radio" name="q0" value="a0">The jungle</label>
+   <label><input type="radio" name="q0" value="a1">Antarctica</label>
+   
+   (you may add classes if you wish to style them and/or you can also style the input and label tags)
+   
+   IMPORTANT: the number of questions and the number of answers per question
+              must match the weights you have defined above
+
+B) PROVIDING A BUTTON TO CHECK THE RESULTS
+
+   You need to add the attribute onclick="quiz()" to an element
+   (typically a <button> but it could be anything)
+   
+   For example:
+   
+   <button type="button" onclick="quiz()">Find out what kind of animal you are...</button>
+  
+C) PROVIDING SECTIONS FOR PRESENTING THE RESULTS
+
+  You need to have id's for the following elements:
+  id="incomplete"
+  id="result0", id="result1", etc.
+  (typically a <div> but they can be anything)
+  
+  <div id="incomplete">You have not answered all of the questions!</div> 
+  <div id="result0">You are a Tiger!</div>
+  <div id="result1">You are a Penguin!</div>
+  <div id="result2">You are a Bear!</div>
+
+  Note that when the page loads, it hides all your results...
+  ... _unless_ you've change always_show = true above...
+  but there may be a flicker when the page loads and the results are hidden
+  
+  adding the style attribute "display: none;" to your result classes will prevent this
+  For now, it has been added inline below
+  (e.g., <div id="result0" style="display: none;">)
+  
+  
+
+-->
+
+
+<h1>QUIZ: Which Minion Are You? 🍌</h1>
+<img src="20d9b12dc7bfbc6b9bc7fa9587ee6312-removebg-preview.png">
+<p>Are you the leader of the bunch or the most huggable bean? Answer these 10 questions to find out which Minion matches your chaotic (or chill) energy best!
+
+<ol>
+
+<li>What’s your ideal weekend activity?
+
+<label><input type="radio" name="q0" value="a0">Telling stories and making everyone laugh 😂</label>
+<label><input type="radio" name="q0" value="a1">Playing with your teddy bear or watching cartoons 🧸</label>
+<label><input type="radio" name="q0" value="a2"> Leading the group on a new adventure 🌍</label>
+<label><input type="radio" name="q0" value="a3">Jamming out with your guitar 🎸</label>
+
+<li>How do your friends describe you?
+
+<label><input type="radio" name="q1" value="a0">Sweet and lovable 🥰</label>
+<label><input type="radio" name="q1" value="a1">Chill and cool 😎</label>
+<label><input type="radio" name="q1" value="a2">Responsible and brave 🛡️</label>
+<label><input type="radio" name="q1" value="a3">Funny and talkative 🗣️</label>
+
+<li>Choose a snack:
+
+<label><input type="radio" name="q2" value="a0">Nachos with extra cheese 🧀</label>
+<label><input type="radio" name="q2" value="a1">Banana smoothie 🍌</label>
+<label><input type="radio" name="q2" value="a2">Cotton candy 🍭</label>
+<label><input type="radio" name="q2" value="a3">Popcorn 🍿</label>
+
+
+<li>Pick a color:
+
+<label><input type="radio" name="q3" value="a0">Yellow</label>
+<label><input type="radio" name="q3" value="a1">Navy Blue</label>
+<label><input type="radio" name="q3" value="a2">Orange</label>
+<label><input type="radio" name="q3" value="a3">Black</label>
+
+<li>How do your friends describe you?
+
+<label><input type="radio" name="q4" value="a0">Rockstar or artist 🎤</label>
+<label><input type="radio" name="q4" value="a1">Comedian or storyteller 🎭</label>
+<label><input type="radio" name="q4" value="a2">Toy designer or animal caretaker 🐶</label>
+<label><input type="radio" name="q4" value="a3">Team leader or explorer 🧭</label>
+
+<li>You’re faced with a challenge. What’s your move?
+
+<label><input type="radio" name="q5" value="a0">Panic a little, but try your best 🥺</label>
+<label><input type="radio" name="q5" value="a1">Step up and take charge 💪</label>
+<label><input type="radio" name="q5" value="a2">Laugh it off and improvise 🤪</label>
+<label><input type="radio" name="q5" value="a3">Wing it and stay cool 🧊</label>
+
+<li>Your style in one word:
+
+<label><input type="radio" name="q6" value="a0">Cute</label>
+<label><input type="radio" name="q6" value="a1">Random</label>
+<label><input type="radio" name="q6" value="a2">Classy</label>
+<label><input type="radio" name="q6" value="a3">Trendy</label>
+
+<li>Which emoji feels most you?
+<label><input type="radio" name="q7" value="a0">🧸</label>
+<label><input type="radio" name="q7" value="a1">🎸</label>
+<label><input type="radio" name="q7" value="a2">🤪</label>
+<label><input type="radio" name="q7" value="a3">🧠</label>
+
+<li>What’s your role in the friend group?
+
+<label><input type="radio" name="q8" value="a0">The innocent sweetheart 💛</label>
+<label><input type="radio" name="q8" value="a1">The wild card and comic relief 🎉</label>
+<label><input type="radio" name="q8" value="a2">The planner and protector 📋</label>
+<label><input type="radio" name="q8" value="a3">The chill one who goes with the flow 🌊</label>
+
+<li>How do you solve problems?
+
+<label><input type="radio" name="q9" value="a0">By hoping for the best 🤞</label>
+<label><input type="radio" name="q9" value="a1">Strategically and calmly 🧩</label>
+<label><input type="radio" name="q9" value="a2">With help from others 👯</label>
+<label><input type="radio" name="q9" value="a3">By talking…like a lot 💬</label>
+
+</ol>
+
+<button type="button" onclick="quiz()">Reveal Your Minion Alter Ego</button>
+
+<div id="incomplete" style="display: none;">
+You have not answered all of the questions yet.
+</div>
+
+<div id="result0" style="display: none;">
+<h2>🍌 Kevin – The Leader</h2>
+<p>You’re Kevin, the tall, responsible, and courageous Minion! You always try to keep things under control, especially when your friends get a little too chaotic. Deep down, you care a lot, even if you act like the "mom friend" of the group.
+<p><strong>Strengths</strong>: Leadership, bravery, loyalty
+<p><strong>Weakness</strong>: Overthinking, bossy moments
+<img src="wall-murals-minion-kevin.jpg-removebg-preview.png" class="image">
+</div>
+
+<div id="result1" style="display: none;">
+<h2>🎸 Stuart – The Cool One</h2>
+<p>You’re Stuart, the one with major chill vibes. You’ve got talent, style, and a mischievous side. You prefer to stay out of drama, but when the moment calls for it, you bring the fun and the guitar solo.
+<p><strong>Strengths</strong>: Creativity, confidence, humor
+<p><strong>Weakness</strong>: Laziness, easily distracted
+<img src="Stuart_with_guitar-removebg-preview.png" class="image">
+</div>
+
+
+<div id="result2" style="display: none;">
+<h2>🧸 Bob – The Sweetheart</h2>
+<p>You’re Bob, the softest cinnamon roll of the squad. You’re kind-hearted, adorable, and have a deep love for life (and teddy bears). Everyone wants to protect you, but you’re braver than you look.
+<p><strong>Strengths</strong>: Kindness, empathy, optimism
+<p><strong>Weakness</strong>: Naïve, emotional
+<img src="Bob_Bear_27s-removebg-preview.png" class="image">
+</div>
+
+<div id="result3" style="display: none;">
+<h2>🤪 Otto – The Goofball</h2>
+<p>You’re Otto, the energetic new kid who talks a lot. You might get sidetracked easily, but your joy and humor are contagious. You’re lovable, chaotic, and never afraid to be yourself—even if it’s a little weird.
+<p><strong>Strengths</strong>: Enthusiasm, storytelling, loyalty
+<p><strong>Weakness</strong>:Always rambling, clumsy
+<img src="i_love_gru_otto_the_minion_by_tryfonasgogos_dhrnqag-fullview-removebg-preview.png" class="image">
+</div>
+
+
+
+</body>
+</html>
